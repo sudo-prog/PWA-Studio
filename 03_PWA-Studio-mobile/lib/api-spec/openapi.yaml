@@ -1,0 +1,807 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: APP Studio API — AI-Assisted Multi-Agent PWA Creator
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: projects
+    description: Project management
+  - name: canvas
+    description: ForgeCanvas wireframe snapshots
+  - name: kanban
+    description: Kanban board tasks and columns
+  - name: agents
+    description: Agent status and activity
+  - name: settings
+    description: LLM key and app settings
+  - name: dashboard
+    description: Dashboard summaries and activity feeds
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Projects ──────────────────────────────────────────────────────────────
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, archived, all]
+            default: all
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Project"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a new project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectInput"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+
+  /projects/{projectId}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a project by ID
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectUpdate"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Canvas ──────────────────────────────────────────────────────────────
+  /projects/{projectId}/canvas:
+    get:
+      operationId: getCanvas
+      tags: [canvas]
+      summary: Get canvas snapshot for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Canvas snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CanvasSnapshot"
+        "404":
+          description: Not found
+    put:
+      operationId: saveCanvas
+      tags: [canvas]
+      summary: Save canvas snapshot for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CanvasInput"
+      responses:
+        "200":
+          description: Saved canvas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CanvasSnapshot"
+
+  # ── Kanban columns ──────────────────────────────────────────────────────
+  /projects/{projectId}/columns:
+    get:
+      operationId: listColumns
+      tags: [kanban]
+      summary: List kanban columns for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of columns
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KanbanColumn"
+
+  # ── Kanban tasks ──────────────────────────────────────────────────────────
+  /projects/{projectId}/tasks:
+    get:
+      operationId: listTasks
+      tags: [kanban]
+      summary: List all kanban tasks for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of tasks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KanbanTask"
+    post:
+      operationId: createTask
+      tags: [kanban]
+      summary: Create a kanban task
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KanbanTaskInput"
+      responses:
+        "201":
+          description: Created task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KanbanTask"
+
+  /projects/{projectId}/tasks/{taskId}:
+    patch:
+      operationId: updateTask
+      tags: [kanban]
+      summary: Update a kanban task
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KanbanTaskUpdate"
+      responses:
+        "200":
+          description: Updated task
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KanbanTask"
+    delete:
+      operationId: deleteTask
+      tags: [kanban]
+      summary: Delete a kanban task
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Agents ──────────────────────────────────────────────────────────────
+  /projects/{projectId}/agents:
+    get:
+      operationId: listAgents
+      tags: [agents]
+      summary: List agent statuses for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List of agent statuses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AgentStatus"
+
+  /projects/{projectId}/agents/{agentRole}:
+    patch:
+      operationId: updateAgentStatus
+      tags: [agents]
+      summary: Update agent status
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: agentRole
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AgentStatusUpdate"
+      responses:
+        "200":
+          description: Updated agent status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AgentStatus"
+
+  # ── Activity feed ────────────────────────────────────────────────────────
+  /projects/{projectId}/activity:
+    get:
+      operationId: getActivityFeed
+      tags: [agents]
+      summary: Get recent agent activity feed for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Activity feed events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityEvent"
+    post:
+      operationId: createActivity
+      tags: [agents]
+      summary: Log an activity event
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityEventInput"
+      responses:
+        "201":
+          description: Created activity event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ActivityEvent"
+
+  # ── Settings ──────────────────────────────────────────────────────────────
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get app settings (LLM keys, preferences)
+      responses:
+        "200":
+          description: App settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update app settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppSettingsUpdate"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppSettings"
+
+  # ── Dashboard summary (wow endpoint) ────────────────────────────────────
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Get dashboard summary — project counts, active agents, recent tasks
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+# ── Components ──────────────────────────────────────────────────────────────
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    Project:
+      type: object
+      required: [id, name, status, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: ["string", "null"]
+        status:
+          type: string
+          enum: [active, building, testing, deployed, archived]
+        framework:
+          type: ["string", "null"]
+        githubRepo:
+          type: ["string", "null"]
+        previewUrl:
+          type: ["string", "null"]
+        taskCount:
+          type: integer
+        completedTaskCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProjectInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        framework:
+          type: string
+        githubRepo:
+          type: string
+
+    ProjectUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        status:
+          type: string
+          enum: [active, building, testing, deployed, archived]
+        framework:
+          type: string
+        githubRepo:
+          type: string
+        previewUrl:
+          type: string
+
+    CanvasSnapshot:
+      type: object
+      required: [id, projectId, elements, updatedAt]
+      properties:
+        id:
+          type: integer
+        projectId:
+          type: integer
+        elements:
+          type: array
+          items:
+            $ref: "#/components/schemas/CanvasElement"
+        thumbnail:
+          type: ["string", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    CanvasElement:
+      type: object
+      required: [id, type, x, y, width, height]
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [rectangle, card, button, input, navbar, list, modal, text, arrow, image, freehand]
+        x:
+          type: number
+        y:
+          type: number
+        width:
+          type: number
+        height:
+          type: number
+        label:
+          type: ["string", "null"]
+        annotation:
+          type: ["string", "null"]
+        color:
+          type: ["string", "null"]
+        zIndex:
+          type: ["integer", "null"]
+
+    CanvasInput:
+      type: object
+      required: [elements]
+      properties:
+        elements:
+          type: array
+          items:
+            $ref: "#/components/schemas/CanvasElement"
+        thumbnail:
+          type: string
+
+    KanbanColumn:
+      type: object
+      required: [id, projectId, name, order, color]
+      properties:
+        id:
+          type: integer
+        projectId:
+          type: integer
+        name:
+          type: string
+        order:
+          type: integer
+        color:
+          type: string
+
+    KanbanTask:
+      type: object
+      required: [id, projectId, columnId, title, agentRole, priority, order, createdAt]
+      properties:
+        id:
+          type: integer
+        projectId:
+          type: integer
+        columnId:
+          type: integer
+        title:
+          type: string
+        description:
+          type: ["string", "null"]
+        agentRole:
+          type: string
+          enum: [director, design, image, builder, tester, deployer, reviewer]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+        order:
+          type: integer
+        branch:
+          type: ["string", "null"]
+        previewUrl:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: ["string", "null"]
+
+    KanbanTaskInput:
+      type: object
+      required: [title, columnId, agentRole]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        columnId:
+          type: integer
+        agentRole:
+          type: string
+          enum: [director, design, image, builder, tester, deployer, reviewer]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+          default: medium
+        branch:
+          type: string
+
+    KanbanTaskUpdate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+        description:
+          type: string
+        columnId:
+          type: integer
+        agentRole:
+          type: string
+          enum: [director, design, image, builder, tester, deployer, reviewer]
+        priority:
+          type: string
+          enum: [low, medium, high, critical]
+        order:
+          type: integer
+        branch:
+          type: string
+        previewUrl:
+          type: string
+        completedAt:
+          type: string
+          format: date-time
+
+    AgentStatus:
+      type: object
+      required: [id, projectId, role, status, updatedAt]
+      properties:
+        id:
+          type: integer
+        projectId:
+          type: integer
+        role:
+          type: string
+          enum: [director, design, image, builder, tester, deployer, reviewer]
+        status:
+          type: string
+          enum: [idle, running, waiting, error, complete]
+        currentTask:
+          type: ["string", "null"]
+        progress:
+          type: ["integer", "null"]
+        updatedAt:
+          type: string
+          format: date-time
+
+    AgentStatusUpdate:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [idle, running, waiting, error, complete]
+        currentTask:
+          type: string
+        progress:
+          type: integer
+
+    ActivityEvent:
+      type: object
+      required: [id, projectId, agentRole, type, message, createdAt]
+      properties:
+        id:
+          type: integer
+        projectId:
+          type: integer
+        agentRole:
+          type: string
+          enum: [director, design, image, builder, tester, deployer, reviewer, system]
+        type:
+          type: string
+          enum: [info, success, warning, error, progress]
+        message:
+          type: string
+        detail:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+
+    ActivityEventInput:
+      type: object
+      required: [agentRole, type, message]
+      properties:
+        agentRole:
+          type: string
+          enum: [director, design, image, builder, tester, deployer, reviewer, system]
+        type:
+          type: string
+          enum: [info, success, warning, error, progress]
+        message:
+          type: string
+        detail:
+          type: string
+
+    AppSettings:
+      type: object
+      required: [id, theme, updatedAt]
+      properties:
+        id:
+          type: integer
+        openaiKey:
+          type: ["string", "null"]
+        anthropicKey:
+          type: ["string", "null"]
+        geminiKey:
+          type: ["string", "null"]
+        customEndpoint:
+          type: ["string", "null"]
+        defaultModel:
+          type: string
+        theme:
+          type: string
+          enum: [light, dark, system]
+        updatedAt:
+          type: string
+          format: date-time
+
+    AppSettingsUpdate:
+      type: object
+      properties:
+        openaiKey:
+          type: string
+        anthropicKey:
+          type: string
+        geminiKey:
+          type: string
+        customEndpoint:
+          type: string
+        defaultModel:
+          type: string
+        theme:
+          type: string
+          enum: [light, dark, system]
+
+    DashboardSummary:
+      type: object
+      required: [totalProjects, activeProjects, deployedProjects, totalTasks, completedTasks, runningAgents, recentActivity]
+      properties:
+        totalProjects:
+          type: integer
+        activeProjects:
+          type: integer
+        deployedProjects:
+          type: integer
+        totalTasks:
+          type: integer
+        completedTasks:
+          type: integer
+        runningAgents:
+          type: integer
+        agentBreakdown:
+          type: array
+          items:
+            $ref: "#/components/schemas/AgentBreakdown"
+        recentActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActivityEvent"
+
+    AgentBreakdown:
+      type: object
+      required: [role, count, status]
+      properties:
+        role:
+          type: string
+        count:
+          type: integer
+        status:
+          type: string
+          enum: [idle, running, waiting, error, complete]

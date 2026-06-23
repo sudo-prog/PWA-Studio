@@ -1,0 +1,996 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: PWA Studio API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: projects
+    description: Project management
+  - name: layouts
+    description: Layout snapshots
+  - name: widgets
+    description: Widget registry
+  - name: conversations
+    description: AI conversation history
+  - name: dashboard
+    description: Dashboard summaries
+  - name: settings
+    description: User settings
+
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  # ── Projects ──────────────────────────────────────────────────────────────
+  /projects:
+    get:
+      operationId: listProjects
+      tags: [projects]
+      summary: List all projects
+      responses:
+        "200":
+          description: List of projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjectSummary"
+    post:
+      operationId: createProject
+      tags: [projects]
+      summary: Create a project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectBody"
+      responses:
+        "201":
+          description: Created project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+
+  /projects/{id}:
+    get:
+      operationId: getProject
+      tags: [projects]
+      summary: Get a project with its layouts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectDetail"
+        "404":
+          description: Not found
+    patch:
+      operationId: updateProject
+      tags: [projects]
+      summary: Update a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProjectBody"
+      responses:
+        "200":
+          description: Updated project
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteProject
+      tags: [projects]
+      summary: Delete a project (cascade)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Layouts ───────────────────────────────────────────────────────────────
+  /projects/{projectId}/layouts:
+    get:
+      operationId: listLayouts
+      tags: [layouts]
+      summary: List layouts for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of layout summaries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LayoutSummary"
+    post:
+      operationId: createLayout
+      tags: [layouts]
+      summary: Create a layout snapshot
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLayoutBody"
+      responses:
+        "201":
+          description: Created layout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Layout"
+
+  /layouts/{id}:
+    get:
+      operationId: getLayout
+      tags: [layouts]
+      summary: Get full layout with grid and flow graph
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Layout detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Layout"
+        "404":
+          description: Not found
+    put:
+      operationId: updateLayout
+      tags: [layouts]
+      summary: Save full layout state
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLayoutBody"
+      responses:
+        "200":
+          description: Updated layout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Layout"
+        "404":
+          description: Not found
+    delete:
+      operationId: deleteLayout
+      tags: [layouts]
+      summary: Delete a layout
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  # ── Widget Registry ────────────────────────────────────────────────────────
+  /widgets/registry:
+    get:
+      operationId: listWidgetRegistry
+      tags: [widgets]
+      summary: List all registered widget types
+      responses:
+        "200":
+          description: Widget registry entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WidgetRegistryEntry"
+    post:
+      operationId: registerWidget
+      tags: [widgets]
+      summary: Register a new widget type
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterWidgetBody"
+      responses:
+        "201":
+          description: Registered widget
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WidgetRegistryEntry"
+
+  /widgets/registry/{slug}:
+    get:
+      operationId: getWidgetRegistryEntry
+      tags: [widgets]
+      summary: Get a widget registry entry by slug
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Widget registry entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WidgetRegistryEntry"
+        "404":
+          description: Not found
+
+  # ── AI Conversations ───────────────────────────────────────────────────────
+  /projects/{projectId}/conversations:
+    get:
+      operationId: listConversations
+      tags: [conversations]
+      summary: Get AI conversation history for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Conversation messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ConversationMessage"
+    post:
+      operationId: appendConversation
+      tags: [conversations]
+      summary: Append a message to conversation history
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppendConversationBody"
+      responses:
+        "201":
+          description: Created message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationMessage"
+    delete:
+      operationId: clearConversations
+      tags: [conversations]
+      summary: Clear all conversation history for a project
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Cleared
+
+  /projects/{projectId}/conversations/chat:
+    post:
+      operationId: chatWithAI
+      tags: [conversations]
+      summary: Send a user message and stream an AI response (SSE)
+      description: |
+        Saves the user message, calls the configured LLM endpoint (from Settings → Local LLM),
+        and streams the assistant response as Server-Sent Events. Each event is a JSON object
+        with one of: `{ content: string }` (token), `{ done: true }` (finished),
+        or `{ error: string }` (LLM error). Returns HTTP 400 if no LLM is configured.
+        NOTE: This endpoint returns text/event-stream — do not use the generated React Query hook;
+        consume with fetch + ReadableStream on the client.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ChatMessageBody"
+      responses:
+        "200":
+          description: SSE stream of assistant tokens
+          content:
+            text/event-stream:
+              schema:
+                type: string
+        "400":
+          description: LLM not configured or invalid URL
+        "404":
+          description: Project not found
+
+  # ── Import ────────────────────────────────────────────────────────────────
+  /import/analyze:
+    post:
+      operationId: analyzePwaZip
+      tags: [import]
+      summary: Upload a PWA ZIP and detect reusable features
+      description: |
+        Accepts a multipart/form-data ZIP upload, extracts it in memory, and
+        heuristically detects distinct features (auth, dashboard, map, chat, etc.)
+        from manifest.json, index.html sections, and source file names.
+        Returns detected features ready for review before extraction.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Analysis result with detected features
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PwaAnalysisResult"
+        "400":
+          description: Invalid file (not a ZIP, corrupt, or missing)
+
+  /import/extract:
+    post:
+      operationId: extractPwaWidgets
+      tags: [import]
+      summary: Convert detected features into widgets and create a rebuilt project
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PwaExtractBody"
+      responses:
+        "201":
+          description: Project created with widgets pre-placed on a layout
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PwaExtractResult"
+        "400":
+          description: Validation error
+
+  # ── Dashboard ─────────────────────────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: Get aggregated dashboard statistics
+      responses:
+        "200":
+          description: Dashboard summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /projects/{id}/activity:
+    get:
+      operationId: getProjectActivity
+      tags: [dashboard]
+      summary: Get recent activity for a project
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project activity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectActivity"
+
+  # ── Settings ──────────────────────────────────────────────────────────────
+  /settings:
+    get:
+      operationId: getSettings
+      tags: [settings]
+      summary: Get user settings
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettings"
+    patch:
+      operationId: updateSettings
+      tags: [settings]
+      summary: Update user settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsBody"
+      responses:
+        "200":
+          description: Updated settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserSettings"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    # ── Projects ──────────────────────────────────────────────────────────
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - description
+        - createdAt
+        - updatedAt
+
+    ProjectSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+        layoutCount:
+          type: integer
+        widgetCount:
+          type: integer
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - description
+        - layoutCount
+        - widgetCount
+        - createdAt
+        - updatedAt
+
+    ProjectDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+        layouts:
+          type: array
+          items:
+            $ref: "#/components/schemas/LayoutSummary"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - description
+        - layouts
+        - createdAt
+        - updatedAt
+
+    CreateProjectBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+      required:
+        - name
+
+    UpdateProjectBody:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        thumbnailUrl:
+          type: string
+          nullable: true
+
+    # ── Layouts ───────────────────────────────────────────────────────────
+    Layout:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        name:
+          type: string
+        gridLayout:
+          type: object
+          description: react-grid-layout state (array of layout items)
+        flowGraph:
+          type: object
+          description: React Flow state (nodes and edges)
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectId
+        - name
+        - gridLayout
+        - flowGraph
+        - createdAt
+        - updatedAt
+
+    LayoutSummary:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectId
+        - name
+        - createdAt
+        - updatedAt
+
+    CreateLayoutBody:
+      type: object
+      properties:
+        name:
+          type: string
+        gridLayout:
+          type: object
+        flowGraph:
+          type: object
+      required:
+        - name
+
+    UpdateLayoutBody:
+      type: object
+      properties:
+        name:
+          type: string
+        gridLayout:
+          type: object
+        flowGraph:
+          type: object
+
+    # ── Widget Registry ────────────────────────────────────────────────────
+    WidgetRegistryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        schema:
+          type: object
+          description: Zod-compatible JSON schema for widget config
+        tags:
+          type: array
+          items:
+            type: string
+        isBuiltin:
+          type: string
+      required:
+        - id
+        - slug
+        - name
+        - version
+        - description
+        - schema
+        - tags
+        - isBuiltin
+
+    RegisterWidgetBody:
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        description:
+          type: string
+        schema:
+          type: object
+        tags:
+          type: array
+          items:
+            type: string
+        isBuiltin:
+          type: string
+      required:
+        - slug
+        - name
+
+    # ── Conversations ──────────────────────────────────────────────────────
+    ConversationMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        projectId:
+          type: string
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        model:
+          type: string
+        tokensUsed:
+          type: integer
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - projectId
+        - role
+        - content
+        - model
+        - createdAt
+
+    AppendConversationBody:
+      type: object
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        model:
+          type: string
+        tokensUsed:
+          type: integer
+          nullable: true
+      required:
+        - role
+        - content
+
+    DetectedFeature:
+      type: object
+      properties:
+        id:
+          type: string
+        suggestedSlug:
+          type: string
+        suggestedName:
+          type: string
+        description:
+          type: string
+        sourceFiles:
+          type: array
+          items:
+            type: string
+        confidence:
+          type: string
+          enum: [high, medium, low]
+        tags:
+          type: array
+          items:
+            type: string
+      required: [id, suggestedSlug, suggestedName, description, sourceFiles, confidence, tags]
+
+    PwaAnalysisResult:
+      type: object
+      properties:
+        appName:
+          type: string
+        appDescription:
+          type: string
+        framework:
+          type: string
+        themeColor:
+          type: string
+        totalFiles:
+          type: integer
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetectedFeature"
+      required: [appName, appDescription, framework, themeColor, totalFiles, features]
+
+    PwaExtractFeature:
+      type: object
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+        schema:
+          type: object
+      required: [slug, name]
+
+    PwaExtractBody:
+      type: object
+      properties:
+        projectName:
+          type: string
+        projectDescription:
+          type: string
+        features:
+          type: array
+          items:
+            $ref: "#/components/schemas/PwaExtractFeature"
+      required: [projectName, features]
+
+    PwaExtractResult:
+      type: object
+      properties:
+        projectId:
+          type: string
+        layoutId:
+          type: string
+        widgetsCreated:
+          type: integer
+        widgetsSkipped:
+          type: integer
+      required: [projectId, layoutId, widgetsCreated, widgetsSkipped]
+
+    ChatMessageBody:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+      required:
+        - content
+
+    # ── Dashboard ─────────────────────────────────────────────────────────
+    DashboardSummary:
+      type: object
+      properties:
+        projectCount:
+          type: integer
+        widgetCount:
+          type: integer
+        layoutCount:
+          type: integer
+        conversationCount:
+          type: integer
+        recentProjects:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjectSummary"
+        topWidgetTypes:
+          type: array
+          items:
+            $ref: "#/components/schemas/WidgetTypeStat"
+      required:
+        - projectCount
+        - widgetCount
+        - layoutCount
+        - conversationCount
+        - recentProjects
+        - topWidgetTypes
+
+    WidgetTypeStat:
+      type: object
+      properties:
+        widgetType:
+          type: string
+        count:
+          type: integer
+      required:
+        - widgetType
+        - count
+
+    ProjectActivity:
+      type: object
+      properties:
+        projectId:
+          type: string
+        recentLayouts:
+          type: array
+          items:
+            $ref: "#/components/schemas/LayoutSummary"
+        recentMessages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationMessage"
+      required:
+        - projectId
+        - recentLayouts
+        - recentMessages
+
+    # ── Settings ──────────────────────────────────────────────────────────
+    UserSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+        theme:
+          type: string
+          enum: [light, dark, system]
+        activeModel:
+          type: string
+        apiOverrides:
+          type: object
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - theme
+        - activeModel
+        - apiOverrides
+        - updatedAt
+
+    UpdateSettingsBody:
+      type: object
+      properties:
+        theme:
+          type: string
+          enum: [light, dark, system]
+        activeModel:
+          type: string
+        apiOverrides:
+          type: object
