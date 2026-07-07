@@ -10,3 +10,4 @@ coverage/
 .expo/
 *.sqlite
 *.db
+graphify-out/

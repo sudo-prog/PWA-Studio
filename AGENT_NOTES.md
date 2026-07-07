@@ -1,6 +1,6 @@
 # Agent Notes — PWA Studio
-**Last updated:** 2026-06-22
-**Status:** Full-stack application complete — needs deployment and testing
+**Last updated:** 2026-06-24
+**Status:** Code + DB + migrations pushed to GitHub (`sudo-prog/PWA-Studio`, branch: master). API runtime debugging pending.
 
 ---
 

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd 02_PWA-Studio-Pro && pnpm install && pnpm --filter @workspace/studio run build",
+  "outputDirectory": "02_PWA-Studio-Pro/artifacts/studio/dist/public",
+  "installCommand": "cd 02_PWA-Studio-Pro && pnpm install",
+  "framework": "vite",
+  "rewrites": [
+    { "source": "/((?!api/|assets/|icons/|favicon.ico|manifest.webmanifest|sw.js|workbox-.*\\.js|registerSW.js).*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/sw.js",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+    }
+  ],
+  "env": {
+    "VITE_API_BASE_URL": "@pwa-studio-api-url"
+  }
+}

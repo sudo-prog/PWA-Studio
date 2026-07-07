@@ -29,7 +29,7 @@
       [
         "expo-router",
         {
-          "origin": "https://replit.com/"
+          "origin": "https://pwa-studio.app/"
         }
       ],
       "expo-font",
