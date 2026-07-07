@@ -11,3 +11,4 @@ coverage/
 *.sqlite
 *.db
 graphify-out/
+.vercel
