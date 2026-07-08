@@ -71,8 +71,8 @@ export default function Settings() {
     if (settings) {
       const overrides = settings.apiOverrides as Record<string, string> | null;
       form.reset({
-        theme: settings.theme as "light" | "dark" | "system",
-        activeModel: settings.activeModel,
+        theme: (settings.theme as "light" | "dark" | "system") ?? "dark",
+        activeModel: settings.activeModel ?? "gpt-4o",
         llmBaseUrl: overrides?.llmBaseUrl ?? "",
         llmApiKey: overrides?.llmApiKey ?? "",
       });
@@ -346,7 +346,7 @@ export default function Settings() {
 
         {settings && (
           <div className="text-xs text-muted-foreground">
-            Last updated {new Date(settings.updatedAt).toLocaleString()}
+            Last updated {settings.updatedAt ? new Date(settings.updatedAt).toLocaleString() : '—'}
           </div>
         )}
       </div>

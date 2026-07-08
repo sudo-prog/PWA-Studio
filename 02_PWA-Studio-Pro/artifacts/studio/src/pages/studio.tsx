@@ -267,7 +267,7 @@ function AIChatPanel({ projectId }: { projectId: string }) {
           </div>
         ) : (
           <div className="space-y-3">
-            {messages?.map((msg) => (
+            {(Array.isArray(messages) ? messages : []).map((msg) => (
               <div
                 key={msg.id}
                 className={`flex flex-col gap-0.5 ${msg.role === "user" ? "items-end" : "items-start"}`}
@@ -395,7 +395,7 @@ function CanvasPanel({
   const { data: layouts } = useListLayouts(projectId, { query: { enabled: !!projectId, queryKey: getListLayoutsQueryKey(projectId) } });
   const { data: registryWidgets } = useListWidgetRegistry();
   const registryBySlug = useMemo(
-    () => Object.fromEntries((registryWidgets ?? []).map((w) => [w.slug, w])),
+    () => Object.fromEntries((Array.isArray(registryWidgets) ? registryWidgets : []).map((w) => [w.slug, w])),
     [registryWidgets]
   );
   const queryClient = useQueryClient();
@@ -489,7 +489,7 @@ function CanvasPanel({
     );
   }
 
-  const layoutName = layouts?.find((l) => l.id === activeLayoutId)?.name;
+  const layoutName = (Array.isArray(layouts) ? layouts : []).find((l) => l.id === activeLayoutId)?.name;
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -765,7 +765,7 @@ function WidgetRegistryDrawer({
 
   const filtered = useMemo(
     () =>
-      widgets?.filter(
+      (Array.isArray(widgets) ? widgets : []).filter(
         (w) =>
           !search ||
           w.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -975,7 +975,7 @@ function InspectorPanel({ projectId }: { projectId: string }) {
   const { toast } = useToast();
 
   const widgetMeta = useMemo(
-    () => widgets?.find((w) => w.slug === selectedItem?.widget?.slug),
+    () => (Array.isArray(widgets) ? widgets : []).find((w) => w.slug === selectedItem?.widget?.slug),
     [widgets, selectedItem]
   );
 
@@ -1217,7 +1217,7 @@ function LayoutsSidebar({ projectId }: { projectId: string }) {
             </div>
           ) : (
             <div className="p-1.5 space-y-0.5">
-              {layouts?.map((layout) => (
+              {(Array.isArray(layouts) ? layouts : []).map((layout) => (
                 <button
                   key={layout.id}
                   className={cn(
@@ -1333,7 +1333,7 @@ export default function Studio() {
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">
             <Clock className="w-3 h-3 inline mr-1" />
-            {formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true })}
+            {project.updatedAt ? formatDistanceToNow(new Date(project.updatedAt), { addSuffix: true }) : '—'}
           </span>
           <Link href="/settings" data-testid="link-settings">
             <Button variant="ghost" size="icon" className="h-7 w-7">

@@ -157,13 +157,13 @@ export default function Dashboard() {
         )}
 
         {/* All projects quick list */}
-        {projects && projects.length > 0 && (
+        {Array.isArray(projects) && projects.length > 0 && (
           <section>
             <h2 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
               All Projects
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {projects.map((p) => (
+              {(projects || []).map((p) => (
                 <Link key={p.id} href={`/projects/${p.id}`} data-testid={`card-all-project-${p.id}`}>
                   <div className="rounded-md border border-border bg-card p-4 hover:bg-accent/50 transition-colors cursor-pointer h-full">
                     <p className="text-sm font-semibold text-foreground mb-1">{p.name}</p>

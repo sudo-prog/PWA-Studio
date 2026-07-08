@@ -86,12 +86,12 @@ export default function Widgets() {
     );
   }
 
-  const filtered = widgets?.filter(
+  const filtered = (Array.isArray(widgets) ? widgets : []).filter(
     (w) =>
       !search ||
-      w.name.toLowerCase().includes(search.toLowerCase()) ||
-      w.slug.includes(search.toLowerCase()) ||
-      w.description.toLowerCase().includes(search.toLowerCase())
+      (w.name && w.name.toLowerCase().includes(search.toLowerCase())) ||
+      (w.slug && w.slug.includes(search.toLowerCase())) ||
+      (w.description && w.description.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (

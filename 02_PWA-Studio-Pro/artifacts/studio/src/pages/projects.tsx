@@ -165,7 +165,7 @@ export default function Projects() {
           </div>
         ) : (
           <div className="space-y-2">
-            {projects?.map((p) => (
+            {(Array.isArray(projects) ? projects : []).map((p) => (
               <div
                 key={p.id}
                 className="flex items-center gap-4 rounded-md border border-border bg-card px-4 py-3 group"
@@ -181,7 +181,7 @@ export default function Projects() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs text-muted-foreground hidden sm:block">
-                    {formatDistanceToNow(new Date(p.updatedAt), { addSuffix: true })}
+                    {p.updatedAt ? formatDistanceToNow(new Date(p.updatedAt), { addSuffix: true }) : '—'}
                   </span>
                   <Button
                     variant="ghost"
