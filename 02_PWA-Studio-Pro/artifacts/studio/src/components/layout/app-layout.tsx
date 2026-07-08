@@ -28,13 +28,13 @@ export function AppLayout({ children, title, breadcrumbs }: AppLayoutProps) {
   const [location] = useLocation();
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background text-foreground" data-testid="app-layout">
+    <div className="flex h-dvh w-full overflow-hidden bg-background text-foreground" data-testid="app-layout">
       {/* Sidebar */}
       <aside className="flex flex-col w-14 border-r border-border bg-sidebar shrink-0" data-testid="sidebar">
         <div className="flex items-center justify-center h-12 border-b border-sidebar-border">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Link href="/" data-testid="link-logo">
+              <Link href="/" data-testid="link-logo" aria-label="PWA Studio home">
                 <div className="flex items-center justify-center w-8 h-8 rounded-md bg-primary text-primary-foreground">
                   <Cpu className="w-4 h-4" />
                 </div>

@@ -54,7 +54,11 @@ const createProjectSchema = z.object({
 type CreateProjectForm = z.infer<typeof createProjectSchema>;
 
 export default function Projects() {
-  const { data: projects, isLoading } = useListProjects();
+  const { data: projectsRaw, isLoading } = useListProjects();
+  // Defensive: the API contract is ProjectSummary[], but a misconfigured/missing
+  // api-server returns an HTML error page (string) or wrapped object. Coerce to a
+  // safe array so the list never throws and blanks the whole app.
+  const projects = Array.isArray(projectsRaw) ? projectsRaw : [];
   const createProject = useCreateProject();
   const deleteProject = useDeleteProject();
   const queryClient = useQueryClient();
@@ -185,11 +189,12 @@ export default function Projects() {
                     className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive"
                     onClick={(e) => { e.preventDefault(); setDeleteId(p.id); }}
                     data-testid={`button-delete-project-${p.id}`}
+                    aria-label={`Delete project ${p.name}`}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                   <Link href={`/studio/${p.id}`}>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`button-open-project-${p.id}`}>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" data-testid={`button-open-project-${p.id}`} aria-label={`Open project ${p.name}`}>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </Link>
