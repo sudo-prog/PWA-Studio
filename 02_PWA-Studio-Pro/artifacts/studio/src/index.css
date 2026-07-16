@@ -196,3 +196,22 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* T-1: enforce minimum 44x44px tap targets on touch / small viewports (MOBILE-UI-STANDARD.md) */
+@layer base {
+  @media (pointer: coarse), (max-width: 767px) {
+    button,
+    a[role="button"],
+    [role="button"],
+    input[type="button"],
+    input[type="submit"],
+    .btn,
+    [class*="btn"],
+    [class*="button"],
+    [class*="nav-item"],
+    [class*="toolbar"] [class*="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
