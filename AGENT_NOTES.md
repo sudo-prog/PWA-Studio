@@ -183,3 +183,7 @@ artifacts/
 - **T-1 fix:** index.css enforces 44x44px on touch/coarse + <=767px; inline `<a href>` promoted to inline-flex so the min-height actually applies to body links (back links, "open in new tab", empty-state CTAs).
 - **Console fix:** API queries (widgets/settings/studio/studio-flow/AI chat) gated behind `import.meta.env.DEV || VITE_API_ENABLED==='true'` so no /api/* 404s fire on the static Vercel deploy. Dashboard/projects already gated.
 - **Commit:** 0dc15d6 (fixes) -> dbb0449 (harness cleanup); pushed to master.
+
+## Deploy Reconciliation — 2026-07-17 (night, post 17:13 CPU-spike force-reset)
+- After the force-reset, reconciliation confirmed: the 6 mobile-std kanban tasks were CODE-complete + committed + pushed (0 ahead/0 behind on each repo); 4 were stale-"blocked" (workers killed pre-status-flip); 3 live URLs (WWW/PWA/DESIGN) were 404 (stale deploys, NOT code). Per user directive (workers code → orchestrator verifies + pushes + deploys; do NOT re-dispatch 6 workers / do NOT crash again): orchestrator ran dispatch-preflight (cap=2, OK), removed worker temp QA scripts (LG+DESIGN), redeployed WWW/PWA/DESIGN via `vercel deploy --prod --yes` (REMOTE build, zero local RAM), verified all live URLs HTTP 200, marked all 6 tasks + umbrella done on kanban board, committed reconciliation notes. RAM stayed CPU<15%/MEM~30% — no crash. Full detail in chief-of-staff OPS_LOG.md.
+- NOTE: PWA-Pro's "gated behind VITE_API_ENABLED" note remains accurate — no live backend deployed for PWA (api-server needs Postgres). Static mobile-std deploy only.

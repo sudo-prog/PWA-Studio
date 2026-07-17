@@ -55,3 +55,6 @@ Architecture decisions, file structure, API patterns, and known issues.
 - [ ] Set `EXPO_PUBLIC_DOMAIN` in Expo environment
 - [ ] Apply database migrations (`pnpm db:push` or direct SQL)
 - [ ] Configure Clerk keys for authentication
+
+## Deploy Reconciliation — 2026-07-17 (night, post 17:13 CPU-spike force-reset)
+- This mobile sub-project (Expo app) was part of the 6-project mobile-std audit. After the CPU-spike force-reset, the orchestrator reconciled: the mobile-std kanban tasks were CODE-complete + committed + pushed; 3 web live URLs (WWW/PWA/DESIGN) had gone 404 from stale deploys and were redeployed via `vercel deploy --prod --yes` (REMOTE build, zero local RAM) — all back to HTTP 200. No crash. This Expo mobile app is built via EAS, not Vercel web deploy. Full detail in chief-of-staff OPS_LOG.md.
