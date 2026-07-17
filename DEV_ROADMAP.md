@@ -45,3 +45,6 @@
 - [ ] E2E tests
 - [ ] Performance optimization
 - [ ] Deployment pipeline
+
+## 2026-07-17 (evening) — Deploy reconciliation
+- Redeployed to prod after crash left URL at 404. `vercel deploy --prod --yes` → pwa-studio-pi.vercel.app now HTTP 200. Orchestrator-only.
