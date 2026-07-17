@@ -34,12 +34,15 @@ import { useToast } from "@/hooks/use-toast";
 export default function StudioFlow() {
   const [, params] = useRoute("/studio/:projectId/flow");
   const projectId = params?.projectId ?? "";
+  // On a static Vercel deploy there is no API server, so disable queries to avoid
+  // 404 console errors. Local dev (DEV) or an explicit VITE_API_ENABLED opt-in keeps them active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
 
   const { data: project, isLoading: projectLoading } = useGetProject(projectId, {
-    query: { enabled: !!projectId, queryKey: getGetProjectQueryKey(projectId) },
+    query: { enabled: apiEnabled && !!projectId, queryKey: getGetProjectQueryKey(projectId) },
   });
   const { data: layouts } = useListLayouts(projectId, {
-    query: { enabled: !!projectId, queryKey: getListLayoutsQueryKey(projectId) },
+    query: { enabled: apiEnabled && !!projectId, queryKey: getListLayoutsQueryKey(projectId) },
   });
 
   const { activeLayoutId, setActiveLayoutId, gridLayout, flowGraph, setFlowGraph, setGridLayout, markSaved } = useEditorStore();
@@ -52,7 +55,7 @@ export default function StudioFlow() {
   }, [layouts, activeLayoutId, setActiveLayoutId]);
 
   const { data: activeLayout } = useGetLayout(activeLayoutId ?? "", {
-    query: { enabled: !!activeLayoutId, queryKey: getGetLayoutQueryKey(activeLayoutId ?? "") },
+    query: { enabled: apiEnabled && !!activeLayoutId, queryKey: getGetLayoutQueryKey(activeLayoutId ?? "") },
   });
 
   const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);

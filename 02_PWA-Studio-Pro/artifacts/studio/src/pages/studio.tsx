@@ -103,8 +103,11 @@ type MessageForm = z.infer<typeof messageSchema>;
    LEFT PANEL — AI Chat Sidebar
    ────────────────────────────────────────────────────────────────────────── */
 function AIChatPanel({ projectId }: { projectId: string }) {
-  const { data: messages, isLoading } = useListConversations(projectId);
-  const { data: settings } = useGetSettings();
+  // On a static Vercel deploy there is no API server, so disable conversation/
+  // settings queries to avoid 404 console errors. Local dev (DEV) / VITE_API_ENABLED opt-in keeps them active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
+  const { data: messages, isLoading } = useListConversations(projectId, undefined, { query: { enabled: apiEnabled && !!projectId } });
+  const { data: settings } = useGetSettings({ query: { enabled: apiEnabled } });
   const updateSettings = useUpdateSettings();
   const clearMsgs = useClearConversations();
   const queryClient = useQueryClient();
@@ -372,6 +375,10 @@ function CanvasPanel({
   projectId: string;
   activeLayoutId: string | null;
 }) {
+  // On a static Vercel deploy there is no API server, so disable the registry
+  // query to avoid 404 console errors. Local dev (DEV) / VITE_API_ENABLED opt-in keeps it active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
+  const updateLayout = useUpdateLayout();
   const {
     gridLayout,
     setGridLayout,
@@ -391,9 +398,8 @@ function CanvasPanel({
     setRightPanelOpen,
   } = useEditorStore();
 
-  const updateLayout = useUpdateLayout();
-  const { data: layouts } = useListLayouts(projectId, { query: { enabled: !!projectId, queryKey: getListLayoutsQueryKey(projectId) } });
-  const { data: registryWidgets } = useListWidgetRegistry();
+  const { data: layouts } = useListLayouts(projectId, { query: { enabled: apiEnabled && !!projectId, queryKey: getListLayoutsQueryKey(projectId) } });
+  const { data: registryWidgets } = useListWidgetRegistry({ query: { enabled: apiEnabled } });
   const registryBySlug = useMemo(
     () => Object.fromEntries((Array.isArray(registryWidgets) ? registryWidgets : []).map((w) => [w.slug, w])),
     [registryWidgets]
@@ -1276,15 +1282,18 @@ function LayoutsSidebar({ projectId }: { projectId: string }) {
 export default function Studio() {
   const [, params] = useRoute("/studio/:projectId");
   const projectId = params?.projectId ?? "";
+  // On a static Vercel deploy there is no API server, so disable queries to avoid
+  // 404 console errors. Local dev (DEV) or an explicit VITE_API_ENABLED opt-in keeps them active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
 
   const { data: project, isLoading: projectLoading } = useGetProject(projectId, {
-    query: { enabled: !!projectId, queryKey: getGetProjectQueryKey(projectId) },
+    query: { enabled: apiEnabled && !!projectId, queryKey: getGetProjectQueryKey(projectId) },
   });
 
   const { activeLayoutId, setActiveLayoutId, setGridLayout, setFlowGraph, markSaved, leftPanelOpen, rightPanelOpen } = useEditorStore();
 
   const { data: activeLayout } = useGetLayout(activeLayoutId ?? "", {
-    query: { enabled: !!activeLayoutId, queryKey: getGetLayoutQueryKey(activeLayoutId ?? "") },
+    query: { enabled: apiEnabled && !!activeLayoutId, queryKey: getGetLayoutQueryKey(activeLayoutId ?? "") },
   });
 
   // Load layout data into store when layout changes

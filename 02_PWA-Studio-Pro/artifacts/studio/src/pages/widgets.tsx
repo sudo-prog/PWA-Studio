@@ -43,7 +43,11 @@ const registerWidgetSchema = z.object({
 type RegisterWidgetForm = z.infer<typeof registerWidgetSchema>;
 
 export default function Widgets() {
-  const { data: widgets, isLoading } = useListWidgetRegistry();
+  // On a static Vercel deploy there is no API server, so disable the list query
+  // to avoid 404 console errors. Local dev (DEV) or an explicit VITE_API_ENABLED
+  // opt-in keeps it active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
+  const { data: widgets, isLoading } = useListWidgetRegistry({ query: { enabled: apiEnabled } });
   const registerWidget = useRegisterWidget();
   const queryClient = useQueryClient();
   const { toast } = useToast();

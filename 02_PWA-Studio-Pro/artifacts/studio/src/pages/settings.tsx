@@ -49,7 +49,10 @@ interface ApiKeyEntry {
 }
 
 export default function Settings() {
-  const { data: settings, isLoading } = useGetSettings();
+  // On a static Vercel deploy there is no API server, so disable queries to avoid
+  // 404 console errors. Local dev (DEV) or an explicit VITE_API_ENABLED opt-in keeps them active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
+  const { data: settings, isLoading } = useGetSettings({ query: { enabled: apiEnabled } });
   const updateSettings = useUpdateSettings();
   const queryClient = useQueryClient();
   const { toast } = useToast();

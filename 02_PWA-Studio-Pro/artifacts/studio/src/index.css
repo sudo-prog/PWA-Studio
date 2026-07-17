@@ -217,9 +217,12 @@
       min-height: 44px !important;
       min-width: 44px !important;
     }
-    /* Inline anchors ignore min-* dimensions; promote interactive anchors to
-       flex boxes so the 44px minimum actually applies to sidebar/nav links. */
+    /* Inline anchors ignore min-* dimensions while display:inline; promote
+       interactive anchors to inline-flex so the 44px minimum actually applies
+       to body/content links (back links, "open in new tab", empty-state CTAs)
+       in addition to sidebar/nav links. */
     a[role="button"],
+    a[href],
     [class*="btn"],
     [class*="button"],
     [class*="nav-item"],

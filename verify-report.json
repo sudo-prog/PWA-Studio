@@ -1,0 +1,72 @@
+{
+  "/projects": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 8,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  },
+  "/widgets": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 6,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  },
+  "/settings": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 9,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  },
+  "/dashboard": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 9,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  },
+  "/studio/demo": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 2,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  },
+  "/studio/demo/flow": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 8,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  },
+  "/does-not-exist-xyz": {
+    "docOverflow": 0,
+    "realOff": 0,
+    "offList": [],
+    "totalTaps": 0,
+    "smallTaps": 0,
+    "tapList": [],
+    "consoleErrs": 0,
+    "errSamples": []
+  }
+}
