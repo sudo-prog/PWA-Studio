@@ -209,9 +209,26 @@
     [class*="btn"],
     [class*="button"],
     [class*="nav-item"],
-    [class*="toolbar"] [class*="button"] {
-      min-height: 44px;
-      min-width: 44px;
+    [class*="toolbar"] [class*="button"],
+    aside a,
+    header a,
+    nav a,
+    a[href] {
+      min-height: 44px !important;
+      min-width: 44px !important;
+    }
+    /* Inline anchors ignore min-* dimensions; promote interactive anchors to
+       flex boxes so the 44px minimum actually applies to sidebar/nav links. */
+    a[role="button"],
+    [class*="btn"],
+    [class*="button"],
+    [class*="nav-item"],
+    aside a,
+    header a,
+    nav a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }

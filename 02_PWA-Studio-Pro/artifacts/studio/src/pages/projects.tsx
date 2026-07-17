@@ -54,7 +54,11 @@ const createProjectSchema = z.object({
 type CreateProjectForm = z.infer<typeof createProjectSchema>;
 
 export default function Projects() {
-  const { data: projectsRaw, isLoading } = useListProjects();
+  // On a Vercel-only frontend deploy there is no backend API server, so skip
+  // the list query to avoid 404 console errors. Local dev (DEV) or an explicit
+  // VITE_API_ENABLED opt-in keeps it active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
+  const { data: projectsRaw, isLoading } = useListProjects({ query: { enabled: apiEnabled } });
   // Defensive: the API contract is ProjectSummary[], but a misconfigured/missing
   // api-server returns an HTML error page (string) or wrapped object. Coerce to a
   // safe array so the list never throws and blanks the whole app.

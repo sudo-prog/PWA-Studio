@@ -42,8 +42,12 @@ function StatCard({
 }
 
 export default function Dashboard() {
-  const { data: summary, isLoading } = useGetDashboardSummary();
-  const { data: projects } = useListProjects();
+  // On a Vercel-only frontend deploy there is no backend API server, so skip
+  // backend queries to avoid 404 console errors. Local dev (DEV) or an explicit
+  // VITE_API_ENABLED opt-in keeps them active.
+  const apiEnabled = import.meta.env.DEV || import.meta.env.VITE_API_ENABLED === "true";
+  const { data: summary, isLoading } = useGetDashboardSummary({ query: { enabled: apiEnabled } });
+  const { data: projects } = useListProjects({ query: { enabled: apiEnabled } });
 
   return (
     <AppLayout title="Dashboard">
