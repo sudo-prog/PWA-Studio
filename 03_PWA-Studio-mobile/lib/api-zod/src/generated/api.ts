@@ -386,10 +386,10 @@ export const GetSettingsResponse = zod.object({
   "anthropicKey": zod.string().nullish(),
   "geminiKey": zod.string().nullish(),
   "customEndpoint": zod.string().nullish(),
-  "defaultModel": zod.string().optional(),
-  "theme": zod.enum(['light', 'dark', 'system']),
   "githubToken": zod.string().nullish(),
   "githubDefaultRepo": zod.string().nullish(),
+  "defaultModel": zod.string().optional(),
+  "theme": zod.enum(['light', 'dark', 'system']),
   "updatedAt": zod.coerce.date()
 })
 
@@ -402,10 +402,10 @@ export const UpdateSettingsBody = zod.object({
   "anthropicKey": zod.string().optional(),
   "geminiKey": zod.string().optional(),
   "customEndpoint": zod.string().optional(),
-  "defaultModel": zod.string().optional(),
-  "theme": zod.enum(['light', 'dark', 'system']).optional(),
   "githubToken": zod.string().optional(),
-  "githubDefaultRepo": zod.string().optional()
+  "githubDefaultRepo": zod.string().optional(),
+  "defaultModel": zod.string().optional(),
+  "theme": zod.enum(['light', 'dark', 'system']).optional()
 })
 
 export const UpdateSettingsResponse = zod.object({
@@ -414,10 +414,10 @@ export const UpdateSettingsResponse = zod.object({
   "anthropicKey": zod.string().nullish(),
   "geminiKey": zod.string().nullish(),
   "customEndpoint": zod.string().nullish(),
-  "defaultModel": zod.string().optional(),
-  "theme": zod.enum(['light', 'dark', 'system']),
   "githubToken": zod.string().nullish(),
   "githubDefaultRepo": zod.string().nullish(),
+  "defaultModel": zod.string().optional(),
+  "theme": zod.enum(['light', 'dark', 'system']),
   "updatedAt": zod.coerce.date()
 })
 

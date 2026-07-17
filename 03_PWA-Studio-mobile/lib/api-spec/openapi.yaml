@@ -743,6 +743,10 @@ components:
           type: ["string", "null"]
         customEndpoint:
           type: ["string", "null"]
+        githubToken:
+          type: ["string", "null"]
+        githubDefaultRepo:
+          type: ["string", "null"]
         defaultModel:
           type: string
         theme:
@@ -762,6 +766,10 @@ components:
         geminiKey:
           type: string
         customEndpoint:
+          type: string
+        githubToken:
+          type: string
+        githubDefaultRepo:
           type: string
         defaultModel:
           type: string

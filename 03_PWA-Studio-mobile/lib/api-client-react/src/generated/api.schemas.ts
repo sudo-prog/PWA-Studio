@@ -374,13 +374,13 @@ export interface AppSettings {
   geminiKey?: string | null;
   /** @nullable */
   customEndpoint?: string | null;
-  defaultModel?: string;
-  theme: AppSettingsTheme;
-  updatedAt: string;
   /** @nullable */
   githubToken?: string | null;
   /** @nullable */
   githubDefaultRepo?: string | null;
+  defaultModel?: string;
+  theme: AppSettingsTheme;
+  updatedAt: string;
 }
 
 export type AppSettingsUpdateTheme = typeof AppSettingsUpdateTheme[keyof typeof AppSettingsUpdateTheme];
@@ -397,10 +397,10 @@ export interface AppSettingsUpdate {
   anthropicKey?: string;
   geminiKey?: string;
   customEndpoint?: string;
-  defaultModel?: string;
-  theme?: AppSettingsUpdateTheme;
   githubToken?: string;
   githubDefaultRepo?: string;
+  defaultModel?: string;
+  theme?: AppSettingsUpdateTheme;
 }
 
 export type AgentBreakdownStatus = typeof AgentBreakdownStatus[keyof typeof AgentBreakdownStatus];

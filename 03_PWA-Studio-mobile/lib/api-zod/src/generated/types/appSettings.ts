@@ -17,11 +17,11 @@ export interface AppSettings {
   geminiKey?: string | null;
   /** @nullable */
   customEndpoint?: string | null;
-  defaultModel?: string;
-  theme: AppSettingsTheme;
   /** @nullable */
   githubToken?: string | null;
   /** @nullable */
   githubDefaultRepo?: string | null;
+  defaultModel?: string;
+  theme: AppSettingsTheme;
   updatedAt: Date;
 }

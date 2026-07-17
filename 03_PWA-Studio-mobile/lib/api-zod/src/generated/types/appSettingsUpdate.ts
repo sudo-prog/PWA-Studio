@@ -12,8 +12,8 @@ export interface AppSettingsUpdate {
   anthropicKey?: string;
   geminiKey?: string;
   customEndpoint?: string;
-  defaultModel?: string;
-  theme?: AppSettingsUpdateTheme;
   githubToken?: string;
   githubDefaultRepo?: string;
+  defaultModel?: string;
+  theme?: AppSettingsUpdateTheme;
 }

@@ -175,3 +175,8 @@ artifacts/
 | `03_PWA-Studio-mobile/artifacts/api-server/src/lib/eventBus.ts` | In-memory event bus |
 | `03_PWA-Studio-mobile/artifacts/app-studio-mobile/app/(tabs)/` | Tab screens |
 | `03_PWA-Studio-mobile/artifacts/app-studio-mobile/app/project/[id].tsx` | Project detail |
+
+## Mobile UI Compliance (MOBILE-UI-STANDARD.md)
+- **Status:** PASS (live: pwa-studio-pi.vercel.app; 404->0, taps 8->0)
+- **Verified:** 2026-07-17 via /tmp/mobile_audit.mjs @390x844 (tap-target >=44px T-1, overflow, safe-area, console errors)
+- **T-1 fix:** enforce 44x44px on touch/coarse + <=767px; backend API queries gated behind DEV||VITE_API_ENABLED to silence 404s on static Vercel deploy.
