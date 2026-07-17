@@ -177,6 +177,9 @@ artifacts/
 | `03_PWA-Studio-mobile/artifacts/app-studio-mobile/app/project/[id].tsx` | Project detail |
 
 ## Mobile UI Compliance (MOBILE-UI-STANDARD.md)
-- **Status:** PASS (live: pwa-studio-pi.vercel.app; 404->0, taps 8->0)
-- **Verified:** 2026-07-17 via /tmp/mobile_audit.mjs @390x844 (tap-target >=44px T-1, overflow, safe-area, console errors)
-- **T-1 fix:** enforce 44x44px on touch/coarse + <=767px; backend API queries gated behind DEV||VITE_API_ENABLED to silence 404s on static Vercel deploy.
+- **Status:** PASS (live: pwa-studio-pi.vercel.app; FAILING=0 on all 7 routes @390x844)
+- **Verified:** 2026-07-17 via per-element Playwright harness (_verify_mobile.cjs, mobile-ui-standards-bible §2) against LIVE prod url.
+  Gate = docOverflow<=2, realOff===0, consoleErrs===0, smallTaps===0 — all routes green.
+- **T-1 fix:** index.css enforces 44x44px on touch/coarse + <=767px; inline `<a href>` promoted to inline-flex so the min-height actually applies to body links (back links, "open in new tab", empty-state CTAs).
+- **Console fix:** API queries (widgets/settings/studio/studio-flow/AI chat) gated behind `import.meta.env.DEV || VITE_API_ENABLED==='true'` so no /api/* 404s fire on the static Vercel deploy. Dashboard/projects already gated.
+- **Commit:** 0dc15d6 (fixes) -> dbb0449 (harness cleanup); pushed to master.
